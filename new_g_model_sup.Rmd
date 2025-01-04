@@ -2,7 +2,11 @@
 title: "new_g_model_to_sup"
 author: "Itay hadash"
 date: "2024-08-21"
-output: html_document
+output:
+  html_document: 
+    keep_md: yes
+  pdf_document: default
+
 ---
 
 ```{r}
@@ -411,10 +415,15 @@ g_til <-(g_hat_s[range_tau>=min_val]/colSums(P_t[,range_tau>=min_val]))/(sum(g_h
 D_at <-diag(g_til) - g_til%*%t(g_til)
 C <- colSums(P_t[,range_tau>=min_val])
 D_a <- diag(g_hat_s) - g_hat_s%*%t(g_hat_s)
+# use D_at instad of
 I <- N*t(Q)%*%D_a%*%t(P)%*%solve(diag(as.vector(P%*%g_hat_s)))%*%P%*%D_a%*%Q
+I_t <- N*t(Q[range_tau>=min_val,])%*%D_at%*%t(P_t[,range_tau>=min_val])%*%solve(diag(as.vector(P_t[,range_tau>=min_val]%*%g_til)))%*%P_t[,range_tau>=min_val]%*%D_at%*%Q[range_tau>=min_val,]
+
 s_dots <-(1/norm(a,"2"))*(diag(x=1,length(a),length(a))-(a%*%t(a)/(norm(a,"2"))^2)) 
 cov_a <- solve(I+s_dots)%*%I%*%solve(I+s_dots)
-my_se_t <- D_at%*%Q[range_tau>=min_val,]%*%cov_a%*%t(Q[range_tau>=min_val,])%*%D_at
+cov_at <- solve(I_t+s_dots)%*%I_t%*%solve(I_t+s_dots)
+
+my_se_t <- D_at%*%Q[range_tau>=min_val,]%*%cov_at%*%t(Q[range_tau>=min_val,])%*%D_at
 g_tilde_sd_simu <-  rbind(g_tilde_sd_simu,sqrt(diag(my_se_t)))
   }
 if (flag_rt==F) {
@@ -549,13 +558,13 @@ pgedf + theme_classic() +theme(legend.position = "bottom", legend.title = elemen
 ```
 ```{r}
 # Simulation SE vs Theoratical SE of g plot
-ressi<-SE_simolation(n_sim=20,c=1,n=10000,rt=-2.5)
-theo_simo_data <-SE_simulation_Theo(n_sim=1,c=1,n=10000,rt=-2.5)
+ressi<-SE_simolation(n_sim=10,c=1,n=10000,rt=-1)
+theo_simo_data <-SE_simulation_Theo(n_sim=10,c=1,n=10000,rt=-1)
 c1 <- apply(ressi$g_tilde,2,sd)
 c2 <-colMeans(data.frame(theo_simo_data[1]))
-plot_df <- data.frame(cbind(range_tau[range_tau>=-2.5],c2,c1))
+plot_df <- data.frame(cbind(range_tau[range_tau>=-1],c2,c1))
 colnames(plot_df)<-c("Theta","theo_g_tilde","simo_g_tilde")
-ggplot(plot_df)+geom_line(aes(x=Theta,y=theo_g_tilde,color="Theoratical SE")) + geom_point(aes(x=Theta,y=simo_g_tilde,color="Simulation SE"))+ggtitle(TeX("Simulation SE vs Theoratical SE of \\tilde{g}(\\alpha;\\theta)")) + ylab("SE")+xlab(TeX("\\theta"))+theme_bw() +theme(legend.position = "bottom", legend.title = element_blank())
+ggplot(plot_df)+geom_line(aes(x=Theta,y=theo_g_tilde,color="Theoratical SE")) + geom_point(aes(x=Theta,y=simo_g_tilde,color="Simulation SE"))+ggtitle(TeX("Simulation SE vs Theoratical SE of \\tilde{g}(\\alpha)")) + ylab("SE")+xlab(TeX("\\theta"))+theme_bw() +theme(legend.position = "bottom", legend.title = element_blank())
 
 
 ```

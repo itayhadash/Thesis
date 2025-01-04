@@ -3,8 +3,9 @@ title: "new_g_model_simulation_sup"
 author: "Itay hadash"
 date: "2024-08-21"
 output:
-  md_document:
-    variant: markdown_github
+  html_document: 
+    keep_md: yes
+  pdf_document: default
 ---
 
 ```{r setup, include=FALSE}
@@ -182,25 +183,25 @@ colnames(df_total)<-c("selected_y","E_theta_trunc","E_theta_selective","E_theta_
 
 Gs_plot<-ggplot(data, aes(x = y)) +  geom_point(aes(y = mu),col = ifelse(y < alp, "grey", "black"), size = 1) + geom_line(data = data.frame(y = y, E_theta_oracle = E_theta_oracle), 
 aes(x = sort(y), y = sort(E_theta_oracle),color = "oracle"),linetype="solid",linewidth = 1) +geom_line(data = data.frame(y = y, E_theta_g = E_theta_g), 
-aes(x = sort(y), y = sort(E_theta_g),color = "G-modeling"),linetype="dashed", linewidth = 1) +geom_line(data=df_total,aes(x = selected_y,y=E_theta_trunc,color = "Truncated G-modeling"), linewidth = 1) +geom_abline(aes(intercept = 0, slope = 1,color = "Naive"), linetype = "dashed",linewidth = 1) +
+aes(x = sort(y), y = sort(E_theta_g),color = "g-modeling"),linetype="dashed", linewidth = 1) +geom_line(data=df_total,aes(x = selected_y,y=E_theta_trunc,color = "Truncated g-modeling"), linewidth = 1) +geom_abline(aes(intercept = 0, slope = 1,color = "Naive"), linetype = "dashed",linewidth = 1) +
 geom_line(data=df_total,aes(x = selected_y,y = E_theta_selective,color = "Selective MLE"), linewidth = 1)+coord_cartesian(ylim=c(min(data$theta),max(data$theta))) +
 geom_vline(xintercept = alp) +
 annotate("text", x = alp - 1.3, y = 2, label = paste0("c=", alp, " cutoff line")) +
-labs(x = "y", y = TeX("E(\\theta | y)")) +
-ggtitle(paste("y vs theta with c =", alp)) +
-scale_color_manual(values = c("oracle" = "red", "G-modeling" = "darkred", "Truncated G-modeling" = "blue","Selective MLE" = "tan", "Naive" = "black"))+
-scale_size_continuous(range = c(2, 2)) + theme_bw() +theme(legend.position = "bottom", legend.title = element_blank()) 
+labs(x = "y", y = TeX("E(\\Theta | y)")) +
+ggtitle(paste("Truncated g-modeling results with c =", alp)) +
+scale_color_manual(values = c("oracle" = "red", "g-modeling" = "darkred", "Truncated g-modeling" = "blue","Selective MLE" = "tan", "Naive" = "black"))+
+scale_size_continuous(range = c(2, 2)) + theme_bw() +theme(legend.position = "bottom", legend.title = element_blank(),legend.text = element_text(size=14)) 
 
 Fs_plot <-ggplot(data, aes(x = y)) +  geom_point(aes(y = mu),col = ifelse(y < alp, "grey", "black"), size = 1) + geom_line(data = data.frame(y = y, E_theta_oracle = E_theta_oracle), 
 aes(x = sort(y), y = sort(E_theta_oracle),color = "oracle"),linetype="solid",linewidth = 1) +geom_line(data = data.frame(y = y, E_theta_g = E_theta_g), 
-aes(x = sort(y), y = sort(E_theta_F),color = "F-modeling"),linetype="dashed", linewidth = 1) +geom_line(data=df_total,aes(x = selected_y,y=E_theta_trunc_F,color = "Truncated F-modeling"), linewidth = 1) +geom_abline(aes(intercept = 0, slope = 1,color = "Naive"), linetype = "dashed",linewidth = 1) +
+aes(x = sort(y), y = sort(E_theta_F),color = "f-modeling"),linetype="dashed", linewidth = 1) +geom_line(data=df_total,aes(x = selected_y,y=E_theta_trunc_F,color = "Truncated f-modeling"), linewidth = 1) +geom_abline(aes(intercept = 0, slope = 1,color = "Naive"), linetype = "dashed",linewidth = 1) +
 geom_line(data=df_total,aes(x = selected_y,y = E_theta_selective,color = "Selective MLE"), linewidth = 1)+coord_cartesian(ylim = c(min(data$theta),max(data$theta))) +
 geom_vline(xintercept = alp) +
 annotate("text", x = alp - 1.3, y = 2, label = paste0("c=", alp, " cutoff line")) +
-labs(x = "y", y = TeX("E(\\theta | y)")) +
-ggtitle(paste("y vs theta with c =", alp)) +
-scale_color_manual(values = c("oracle" = "red", "F-modeling" = "darkred", "Truncated F-modeling" = "blue","Selective MLE" = "tan", "Naive" = "black"))+
-scale_size_continuous(range = c(2, 2))+theme_bw()+theme(legend.position = "bottom", legend.title = element_blank()) 
+labs(x = "y", y = TeX("E(\\Theta | y)")) +
+ggtitle(paste("Truncated f-modeling results with c =", alp)) +
+scale_color_manual(values = c("oracle" = "red", "f-modeling" = "darkred", "Truncated f-modeling" = "green","Selective MLE" = "tan", "Naive" = "black"))+
+scale_size_continuous(range = c(2, 2))+theme_bw()+theme(legend.position = "bottom", legend.title = element_blank(),legend.text = element_text(size=14)) 
 
 if (plt2==T) {
 print(ggarrange(Fs_plot,Gs_plot,nrow = 1))
@@ -221,60 +222,60 @@ return(df_total)
 
 ```{r,fig.width=12,fig.height=5}
 hiv <- hivdata
-ggplot(data =data.frame(hiv)) +geom_histogram(aes(hiv),bins = 30,col="black",fill="white") + ggtitle(TeX("Histogram of HIV microarray")) +theme_bw() +xlab(TeX("\\theta"))
+ggplot(data =data.frame(hiv)) +geom_histogram(aes(hiv),bins = 30,col="black",fill="white") + ggtitle(TeX("Histogram of HIV microarray")) +theme_bw() +xlab(TeX("\\Theta"))
 
-df_total<-MSE_simulation(mu=hiv,tau_range =  c(-5,6),alp=1,plt2=T,ct=0.005,rank = 5)
+df_total<-MSE_simulation(mu=hiv,tau_range =  c(-5,6),alp=1,plt3=T,ct=0.005,rank = 5)
 MSE_df <- data.frame()
 findf <- data.frame()
 findf_sd <-data.frame()
 alp_range <-seq(0,3,1)
-for (j in alp_range) {
-  for (i in 1:1) {
-  dfs<-MSE_simulation(mu=hiv,tau_range = c(-5,6),alp=j,ct=0.005,rank = 5)
-  MSE_s <-c(mean((dfs$E_theta_trunc-dfs$theta_selected)^2),mean((dfs$E_theta_selective[dfs$E_theta_selective>-4]-dfs$theta_selected[dfs$E_theta_selective>-4])^2),mean((dfs$E_theta_g-dfs$theta_selected)^2),mean((dfs$E_theta_trunc_F-dfs$theta_selected)^2),mean((dfs$E_theta_oracle-dfs$theta_selected)^2),mean((dfs$E_theta_F-dfs$theta_selected)^2),mean((dfs$selected_y-dfs$theta_selected)^2))
-  MSE_df<-rbind(MSE_df,MSE_s)
-  }
-  findf<-rbind(findf,colMeans(MSE_df))
-  findf_sd <-rbind(findf_sd,apply(MSE_df,2,sd))
-  MSE_df <- data.frame()
-}
+#for (j in alp_range) {
+#  for (i in 1:2) {
+#  dfs<-MSE_simulation(mu=hiv,tau_range = c(-5,6),alp=j,ct=0.005,rank = 5)
+#  MSE_s <-c(mean((dfs$E_theta_trunc-dfs$theta_selected)^2),mean((dfs$E_theta_selective[dfs$#E_theta_selective>-4]-dfs$theta_selected[dfs$E_theta_selective>-4])^2),mean((dfs$E_theta_g-#dfs$theta_selected)^2),mean((dfs$E_theta_trunc_F-dfs$theta_selected)^2),mean((dfs$E_theta_o#racle-dfs$theta_selected)^2),mean((dfs$E_theta_F-dfs$theta_selected)^2),mean((dfs$selected_#y-dfs$theta_selected)^2))
+#  MSE_df<-rbind(MSE_df,MSE_s)
+#  }
+#  findf<-rbind(findf,colMeans(MSE_df))
+#  findf_sd <-rbind(findf_sd,apply(MSE_df,2,sd))
+#  MSE_df <- data.frame()
+#}
 
-colnames(findf)<-c("E_theta_trunc_G","E_theta-selective","E_theta_G","E_theta_trunc_F","E_theta_oracle","E_theta_F","Naive")
-rownames(findf)<-c("0","1","2","3")
-print(findf)
-colnames(findf_sd)<-c("E_theta_trunc_G","E_theta-selective","E_theta_G","E_theta_trunc_F","E_theta_oracle","E_theta_F","Naive")
-rownames(findf_sd)<-c("0","1","2","3")
-print(findf_sd)
+#colnames(findf)<-c("E_theta_trunc_G","E_theta-selective","E_theta_G","E_theta_trunc_F","E_theta_oracle","E_theta_F","Naive")
+#rownames(findf)<-c("0","1","2","3")
+#print(findf)
+#colnames(findf_sd)<-c("E_theta_trunc_G","E_theta-selective","E_theta_G","E_theta_trunc_F","#E_theta_oracle","E_theta_F","Naive")
+#rownames(findf_sd)<-c("0","1","2","3")
+#print(findf_sd)
 ```
 
 
 
 ```{r,fig.width=12,fig.height=5}
 t<-disjointTheta
-ggplot(data =data.frame(t)) +geom_histogram(aes(t),bins = 30,col="black",fill="white") + ggtitle(TeX("Histogram of disjointTheta")) +theme_bw()+xlab(TeX("\\theta"))
+ggplot(data =data.frame(t)) +geom_histogram(aes(t),bins = 30,col="black",fill="white") + ggtitle(TeX("Histogram of disjointTheta")) +theme_bw()+xlab(TeX("\\Theta"))
 
-df_total<-MSE_simulation(mu=t,tau_range =  c(-2,3),alp=1,plt2=T,ct=0.1,rank=3)
+df_total<-MSE_simulation(mu=t,tau_range =  c(-2,3),alp=1,plt3=T,ct=0.1,rank=3)
 MSE_df <- data.frame()
 findf <- data.frame()
 findf_sd <-data.frame()
 alp_range <-seq(0,3,1)
-for (j in alp_range) {
-  for (i in 1:1) {
-  dfs<-MSE_simulation(mu=t,tau_range = c(-2,3),alp=j,ct=0.1,rank=3)
-  MSE_s <-c(mean((dfs$E_theta_trunc-dfs$theta_selected)^2),mean((dfs$E_theta_selective[dfs$E_theta_selective>-2]-dfs$theta_selected[dfs$E_theta_selective>-2])^2),mean((dfs$E_theta_g-dfs$theta_selected)^2),mean((dfs$E_theta_trunc_F-dfs$theta_selected)^2),mean((dfs$E_theta_oracle-dfs$theta_selected)^2),mean((dfs$E_theta_F-dfs$theta_selected)^2),mean((dfs$selected_y-dfs$theta_selected)^2))
-  MSE_df<-rbind(MSE_df,MSE_s)
-  }
- findf<-rbind(findf,colMeans(MSE_df))
-  findf_sd <-rbind(findf_sd,apply(MSE_df,2,sd))
-  MSE_df <- data.frame()
-}
+#for (j in alp_range) {
+#  for (i in 1:2) {
+#  dfs<-MSE_simulation(mu=t,tau_range = c(-2,3),alp=j,ct=0.1,rank=3)
+#  MSE_s <-c(mean((dfs$E_theta_trunc-dfs$theta_selected)^2),mean((dfs$E_theta_selective[dfs$#E_theta_selective>-2]-dfs$theta_selected[dfs$E_theta_selective>-2])^2),mean((dfs$E_theta_g-#dfs$theta_selected)^2),mean((dfs$E_theta_trunc_F-dfs$theta_selected)^2),mean((dfs$E_theta_o#racle-dfs$theta_selected)^2),mean((dfs$E_theta_F-dfs$theta_selected)^2),mean((dfs$selected_#y-dfs$theta_selected)^2))
+#  MSE_df<-rbind(MSE_df,MSE_s)
+#  }
+# findf<-rbind(findf,colMeans(MSE_df))
+#  findf_sd <-rbind(findf_sd,apply(MSE_df,2,sd))
+#  MSE_df <- data.frame()
+#}
 
-colnames(findf)<-c("E_theta_trunc_G","E_theta-selective","E_theta_G","E_theta_trunc_F","E_theta_oracle","E_theta_F","Naive")
-rownames(findf)<-c("0","1","2","3")
-print(findf)
-colnames(findf_sd)<-c("E_theta_trunc_G","E_theta-selective","E_theta_G","E_theta_trunc_F","E_theta_oracle","E_theta_F","Naive")
-rownames(findf_sd)<-c("0","1","2","3")
-print(findf_sd)
+#colnames(findf)<-c("E_theta_trunc_G","E_theta-selective","E_theta_G","E_theta_trunc_F","E_t#heta_oracle","E_theta_F","Naive")
+#rownames(findf)<-c("0","1","2","3")
+#print(findf)
+#colnames(findf_sd)<-c("E_theta_trunc_G","E_theta-selective","E_theta_G","E_theta_trunc_F","#E_theta_oracle","E_theta_F","Naive")
+#rownames(findf_sd)<-c("0","1","2","3")
+#print(findf_sd)
 ```
 
 
@@ -290,33 +291,36 @@ for (i in 1:10000) {
 }
 
 
-ggplot(data =data.frame(t)) +geom_histogram(aes(t),bins = 30,col="black",fill="white") + ggtitle(TeX("Gaussion Mixture")) +theme_bw() +xlab(TeX("\\theta"))
+ggplot(data =data.frame(t)) +geom_histogram(aes(t),bins = 30,col="black",fill="white") + ggtitle(TeX("Gaussion Mixture")) +theme_bw() +xlab(TeX("\\Theta"))
 
-df_total<-MSE_simulation(mu=t,tau_range =  c(-5,7),alp=1,plt2=T,ct=0.005,rank=5)
+df_total<-MSE_simulation(mu=t,tau_range =  c(-5,7),alp=1,plt3=T,ct=0.005,rank=5)
 
 MSE_df <- data.frame()
 findf <- data.frame()
 findf_sd <-data.frame()
 alp_range <-seq(0,3,1)
-for (j in alp_range) {
-  for (i in 1:1) {
-  dfs<-MSE_simulation(mu=t,tau_range = c(-5,7),alp=j,ct=0.005,rank=5)
-  MSE_s <-c(mean((dfs$E_theta_trunc-dfs$theta_selected)^2),mean((dfs$E_theta_selective[dfs$E_theta_selective>-1.5]-dfs$theta_selected[dfs$E_theta_selective>-1.5])^2),mean((dfs$E_theta_g-dfs$theta_selected)^2),mean((dfs$E_theta_trunc_F-dfs$theta_selected)^2),mean((dfs$E_theta_oracle-dfs$theta_selected)^2),mean((dfs$E_theta_F-dfs$theta_selected)^2),mean((dfs$selected_y-dfs$theta_selected)^2))
-  MSE_df<-rbind(MSE_df,MSE_s)
-  }
- findf<-rbind(findf,colMeans(MSE_df))
-  findf_sd <-rbind(findf_sd,apply(MSE_df,2,sd))
-  MSE_df <- data.frame()
-}
+#for (j in alp_range) {
+#  for (i in 1:2) {
+#  dfs<-MSE_simulation(mu=t,tau_range = c(-5,7),alp=j,ct=0.005,rank=5)
+#  MSE_s <-c(mean((dfs$E_theta_trunc-dfs$theta_selected)^2),mean((dfs$E_theta_selective[dfs$#E_theta_selective>-1.5]-dfs$theta_selected[dfs$E_theta_selective>-1.5])^2),mean((dfs$E_thet#a_g-dfs$theta_selected)^2),mean((dfs$E_theta_trunc_F-dfs$theta_selected)^2),mean((dfs$E_the#ta_oracle-dfs$theta_selected)^2),mean((dfs$E_theta_F-dfs$theta_selected)^2),mean((dfs$selec#ted_y-dfs$theta_selected)^2))
+#  MSE_df<-rbind(MSE_df,MSE_s)
+#  }
+# findf<-rbind(findf,colMeans(MSE_df))
+#  findf_sd <-rbind(findf_sd,apply(MSE_df,2,sd))
+#  MSE_df <- data.frame()
+#}
 
-colnames(findf)<-c("E_theta_trunc_G","E_theta-selective","E_theta_G","E_theta_trunc_F","E_theta_oracle","E_theta_F","Naive")
-rownames(findf)<-c("0","1","2","3")
-print(findf)
-colnames(findf_sd)<-c("E_theta_trunc_G","E_theta-selective","E_theta_G","E_theta_trunc_F","E_theta_oracle","E_theta_F","Naive")
-rownames(findf_sd)<-c("0","1","2","3")
-print(findf_sd)
+#colnames(findf)<-c("E_theta_trunc_G","E_theta-selective","E_theta_G","E_theta_trunc_F","E_t#heta_oracle","E_theta_F","Naive")
+#rownames(findf)<-c("0","1","2","3")
+#print(findf)
+#colnames(findf_sd)<-c("E_theta_trunc_G","E_theta-selective","E_theta_G","E_theta_trunc_F","#E_theta_oracle","E_theta_F","Naive")
+#rownames(findf_sd)<-c("0","1","2","3")
+#print(findf_sd)
 
 ```
+
+
+
 ```{r}
 gdat_samp<- read.csv("GDR3_QUASARS_1.csv")
 
@@ -343,7 +347,7 @@ P_t <-deconvo_trunc_comp(a=alpa,b=Inf,tau=true_parallax,X=truncated_parallax,pDe
 result <- deconvo_trunc(a=alpa,b=Inf,tau=true_parallax,X=truncated_parallax,pDegree=4,n=100,c0=1)
 tprobs.hat <- result$stats[,'g']
 ct1 <-colSums(P_t)>ct
-plot(result$stats[,'theta'],result$stats[,'g'])
+
 f <- function(tau,y,tprobs.hat,sd1=1,sd2=1,ct){sum(tau[ct]/sd1 * tprobs.hat[ct] * dnorm(x=y,mean=tau[ct],sd = sd2)/(1-pnorm(q=alpa,mean =tau[ct] ,sd = sd2)),na.rm = TRUE)/sum(tprobs.hat[ct] * dnorm(x=y,mean=tau[ct],sd = sd2)/(1-pnorm(q=alpa,mean =tau[ct],sd = sd2)),na.rm = TRUE)}
 
 
@@ -400,3 +404,7 @@ scale_color_manual(values = c("Truncated G-modeling" = "blue", "Lutz-Kelker corr
 scale_size_continuous(range = c(2, 2)) + theme_bw() +theme(legend.position = "bottom", legend.title = element_blank()) 
 Gs_plot
 ```
+
+
+
+
