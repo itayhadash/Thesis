@@ -1,4 +1,17 @@
-``` r
+---
+title: "new_g_model_simulation_sup"
+author: "Itay hadash"
+date: "2024-08-21"
+output:
+  html_document: 
+    keep_md: yes
+  pdf_document: default
+---
+
+
+
+
+```r
 # function to use in the simulation
 
 deconvo_trunc <- function(a,b,tau,X,pDegree,n=40,c0=1,fam="Normal") {
@@ -47,15 +60,17 @@ create_P_matrix <- function(nr=2,nc=2,x=c(0,1),theta=c(1,2),sig=c(1,2),eps=0.001
 }
 ```
 
-``` r
+
+```r
 theta <- runif(10000,0,2)# theta is uniform
 y <- rnorm(10000,theta,1) # y is normal distribution with mu=theta
 ggplot(data =data.frame(y) ) +geom_histogram(aes(y),bins = 30,col="black",fill="white") + ggtitle(TeX("Histogram of y~N(\\theta,1)")) +theme_bw()
 ```
 
-![](new_g_model_simulation_sup_files/figure-markdown_github/unnamed-chunk-2-1.png)
+![](new_g_model_simulation_sup_files/figure-html/unnamed-chunk-2-1.png)<!-- -->
 
-``` r
+
+```r
 library('locfdr')
 data(hivdata)
 alp <- 1.64
@@ -65,7 +80,10 @@ oracle_bayes <- function(theta,y){ # estimation of theta
 }
 ```
 
-``` r
+
+
+
+```r
 # 
 MSE_simulation<-function(mu,alp,plt1=F,plt2=F,plt3=F,tau_range,ct,rank=6){
 
@@ -146,25 +164,25 @@ colnames(df_total)<-c("selected_y","E_theta_trunc","E_theta_selective","E_theta_
 
 Gs_plot<-ggplot(data, aes(x = y)) +  geom_point(aes(y = mu),col = ifelse(y < alp, "grey", "black"), size = 1) + geom_line(data = data.frame(y = y, E_theta_oracle = E_theta_oracle), 
 aes(x = sort(y), y = sort(E_theta_oracle),color = "oracle"),linetype="solid",linewidth = 1) +geom_line(data = data.frame(y = y, E_theta_g = E_theta_g), 
-aes(x = sort(y), y = sort(E_theta_g),color = "G-modeling"),linetype="dashed", linewidth = 1) +geom_line(data=df_total,aes(x = selected_y,y=E_theta_trunc,color = "Truncated G-modeling"), linewidth = 1) +geom_abline(aes(intercept = 0, slope = 1,color = "Naive"), linetype = "dashed",linewidth = 1) +
+aes(x = sort(y), y = sort(E_theta_g),color = "g-modeling"),linetype="dashed", linewidth = 1) +geom_line(data=df_total,aes(x = selected_y,y=E_theta_trunc,color = "Truncated g-modeling"), linewidth = 1) +geom_abline(aes(intercept = 0, slope = 1,color = "Naive"), linetype = "dashed",linewidth = 1) +
 geom_line(data=df_total,aes(x = selected_y,y = E_theta_selective,color = "Selective MLE"), linewidth = 1)+coord_cartesian(ylim=c(min(data$theta),max(data$theta))) +
 geom_vline(xintercept = alp) +
 annotate("text", x = alp - 1.3, y = 2, label = paste0("c=", alp, " cutoff line")) +
-labs(x = "y", y = TeX("E(\\theta | y)")) +
-ggtitle(paste("y vs theta with c =", alp)) +
-scale_color_manual(values = c("oracle" = "red", "G-modeling" = "darkred", "Truncated G-modeling" = "blue","Selective MLE" = "tan", "Naive" = "black"))+
-scale_size_continuous(range = c(2, 2)) + theme_bw() +theme(legend.position = "bottom", legend.title = element_blank()) 
+labs(x = "y", y = TeX("E(\\Theta | y)")) +
+ggtitle(paste("Truncated g-modeling results with c =", alp)) +
+scale_color_manual(values = c("oracle" = "red", "g-modeling" = "darkred", "Truncated g-modeling" = "blue","Selective MLE" = "tan", "Naive" = "black"))+
+scale_size_continuous(range = c(2, 2)) + theme_bw() +theme(legend.position = "bottom", legend.title = element_blank(),legend.text = element_text(size=14)) 
 
 Fs_plot <-ggplot(data, aes(x = y)) +  geom_point(aes(y = mu),col = ifelse(y < alp, "grey", "black"), size = 1) + geom_line(data = data.frame(y = y, E_theta_oracle = E_theta_oracle), 
 aes(x = sort(y), y = sort(E_theta_oracle),color = "oracle"),linetype="solid",linewidth = 1) +geom_line(data = data.frame(y = y, E_theta_g = E_theta_g), 
-aes(x = sort(y), y = sort(E_theta_F),color = "F-modeling"),linetype="dashed", linewidth = 1) +geom_line(data=df_total,aes(x = selected_y,y=E_theta_trunc_F,color = "Truncated F-modeling"), linewidth = 1) +geom_abline(aes(intercept = 0, slope = 1,color = "Naive"), linetype = "dashed",linewidth = 1) +
+aes(x = sort(y), y = sort(E_theta_F),color = "f-modeling"),linetype="dashed", linewidth = 1) +geom_line(data=df_total,aes(x = selected_y,y=E_theta_trunc_F,color = "Truncated f-modeling"), linewidth = 1) +geom_abline(aes(intercept = 0, slope = 1,color = "Naive"), linetype = "dashed",linewidth = 1) +
 geom_line(data=df_total,aes(x = selected_y,y = E_theta_selective,color = "Selective MLE"), linewidth = 1)+coord_cartesian(ylim = c(min(data$theta),max(data$theta))) +
 geom_vline(xintercept = alp) +
 annotate("text", x = alp - 1.3, y = 2, label = paste0("c=", alp, " cutoff line")) +
-labs(x = "y", y = TeX("E(\\theta | y)")) +
-ggtitle(paste("y vs theta with c =", alp)) +
-scale_color_manual(values = c("oracle" = "red", "F-modeling" = "darkred", "Truncated F-modeling" = "blue","Selective MLE" = "tan", "Naive" = "black"))+
-scale_size_continuous(range = c(2, 2))+theme_bw()+theme(legend.position = "bottom", legend.title = element_blank()) 
+labs(x = "y", y = TeX("E(\\Theta | y)")) +
+ggtitle(paste("Truncated f-modeling results with c =", alp)) +
+scale_color_manual(values = c("oracle" = "red", "f-modeling" = "darkred", "Truncated f-modeling" = "green","Selective MLE" = "tan", "Naive" = "black"))+
+scale_size_continuous(range = c(2, 2))+theme_bw()+theme(legend.position = "bottom", legend.title = element_blank(),legend.text = element_text(size=14)) 
 
 if (plt2==T) {
 print(ggarrange(Fs_plot,Gs_plot,nrow = 1))
@@ -180,131 +198,90 @@ return(df_total)
 }
 ```
 
-``` r
+
+
+```r
 hiv <- hivdata
-ggplot(data =data.frame(hiv)) +geom_histogram(aes(hiv),bins = 30,col="black",fill="white") + ggtitle(TeX("Histogram of HIV microarray")) +theme_bw() +xlab(TeX("\\theta"))
+ggplot(data =data.frame(hiv)) +geom_histogram(aes(hiv),bins = 30,col="black",fill="white") + ggtitle(TeX("Histogram of HIV microarray")) +theme_bw() +xlab(TeX("\\Theta"))
 ```
 
-![](new_g_model_simulation_sup_files/figure-markdown_github/unnamed-chunk-5-1.png)
+![](new_g_model_simulation_sup_files/figure-html/unnamed-chunk-5-1.png)<!-- -->
 
-``` r
-df_total<-MSE_simulation(mu=hiv,tau_range =  c(-5,6),alp=1,plt2=T,ct=0.005,rank = 5)
+```r
+df_total<-MSE_simulation(mu=hiv,tau_range =  c(-5,6),alp=1,plt3=T,ct=0.005,rank = 5)
 ```
 
-![](new_g_model_simulation_sup_files/figure-markdown_github/unnamed-chunk-5-2.png)
+![](new_g_model_simulation_sup_files/figure-html/unnamed-chunk-5-2.png)<!-- -->![](new_g_model_simulation_sup_files/figure-html/unnamed-chunk-5-3.png)<!-- -->
 
-``` r
+```r
 MSE_df <- data.frame()
 findf <- data.frame()
 findf_sd <-data.frame()
 alp_range <-seq(0,3,1)
-for (j in alp_range) {
-  for (i in 1:1) {
-  dfs<-MSE_simulation(mu=hiv,tau_range = c(-5,6),alp=j,ct=0.005,rank = 5)
-  MSE_s <-c(mean((dfs$E_theta_trunc-dfs$theta_selected)^2),mean((dfs$E_theta_selective[dfs$E_theta_selective>-4]-dfs$theta_selected[dfs$E_theta_selective>-4])^2),mean((dfs$E_theta_g-dfs$theta_selected)^2),mean((dfs$E_theta_trunc_F-dfs$theta_selected)^2),mean((dfs$E_theta_oracle-dfs$theta_selected)^2),mean((dfs$E_theta_F-dfs$theta_selected)^2),mean((dfs$selected_y-dfs$theta_selected)^2))
-  MSE_df<-rbind(MSE_df,MSE_s)
-  }
-  findf<-rbind(findf,colMeans(MSE_df))
-  findf_sd <-rbind(findf_sd,apply(MSE_df,2,sd))
-  MSE_df <- data.frame()
-}
+#for (j in alp_range) {
+#  for (i in 1:2) {
+#  dfs<-MSE_simulation(mu=hiv,tau_range = c(-5,6),alp=j,ct=0.005,rank = 5)
+#  MSE_s <-c(mean((dfs$E_theta_trunc-dfs$theta_selected)^2),mean((dfs$E_theta_selective[dfs$#E_theta_selective>-4]-dfs$theta_selected[dfs$E_theta_selective>-4])^2),mean((dfs$E_theta_g-#dfs$theta_selected)^2),mean((dfs$E_theta_trunc_F-dfs$theta_selected)^2),mean((dfs$E_theta_o#racle-dfs$theta_selected)^2),mean((dfs$E_theta_F-dfs$theta_selected)^2),mean((dfs$selected_#y-dfs$theta_selected)^2))
+#  MSE_df<-rbind(MSE_df,MSE_s)
+#  }
+#  findf<-rbind(findf,colMeans(MSE_df))
+#  findf_sd <-rbind(findf_sd,apply(MSE_df,2,sd))
+#  MSE_df <- data.frame()
+#}
 
-colnames(findf)<-c("E_theta_trunc_G","E_theta-selective","E_theta_G","E_theta_trunc_F","E_theta_oracle","E_theta_F","Naive")
-rownames(findf)<-c("0","1","2","3")
-print(findf)
+#colnames(findf)<-c("E_theta_trunc_G","E_theta-selective","E_theta_G","E_theta_trunc_F","E_theta_oracle","E_theta_F","Naive")
+#rownames(findf)<-c("0","1","2","3")
+#print(findf)
+#colnames(findf_sd)<-c("E_theta_trunc_G","E_theta-selective","E_theta_G","E_theta_trunc_F","#E_theta_oracle","E_theta_F","Naive")
+#rownames(findf_sd)<-c("0","1","2","3")
+#print(findf_sd)
 ```
 
-    ##   E_theta_trunc_G E_theta-selective E_theta_G E_theta_trunc_F E_theta_oracle
-    ## 0       0.4960102          2.156671 0.4897821       0.5014519      0.4902111
-    ## 1       0.5771766          2.791615 0.5629122       0.5664229      0.5551395
-    ## 2       0.7915634          3.779202 0.7799920       0.8133371      0.7838380
-    ## 3       1.2094434          3.170558 0.9672980       1.1902460      0.9534126
-    ##   E_theta_F    Naive
-    ## 0 0.4916418 1.044543
-    ## 1 0.5616557 1.772004
-    ## 2 0.7810601 2.495287
-    ## 3 0.9738404 3.368642
 
-``` r
-colnames(findf_sd)<-c("E_theta_trunc_G","E_theta-selective","E_theta_G","E_theta_trunc_F","E_theta_oracle","E_theta_F","Naive")
-rownames(findf_sd)<-c("0","1","2","3")
-print(findf_sd)
-```
 
-    ##   E_theta_trunc_G E_theta-selective E_theta_G E_theta_trunc_F E_theta_oracle
-    ## 0              NA                NA        NA              NA             NA
-    ## 1              NA                NA        NA              NA             NA
-    ## 2              NA                NA        NA              NA             NA
-    ## 3              NA                NA        NA              NA             NA
-    ##   E_theta_F Naive
-    ## 0        NA    NA
-    ## 1        NA    NA
-    ## 2        NA    NA
-    ## 3        NA    NA
 
-``` r
+```r
 t<-disjointTheta
-ggplot(data =data.frame(t)) +geom_histogram(aes(t),bins = 30,col="black",fill="white") + ggtitle(TeX("Histogram of disjointTheta")) +theme_bw()+xlab(TeX("\\theta"))
+ggplot(data =data.frame(t)) +geom_histogram(aes(t),bins = 30,col="black",fill="white") + ggtitle(TeX("Histogram of disjointTheta")) +theme_bw()+xlab(TeX("\\Theta"))
 ```
 
-![](new_g_model_simulation_sup_files/figure-markdown_github/unnamed-chunk-6-1.png)
+![](new_g_model_simulation_sup_files/figure-html/unnamed-chunk-6-1.png)<!-- -->
 
-``` r
-df_total<-MSE_simulation(mu=t,tau_range =  c(-2,3),alp=1,plt2=T,ct=0.1,rank=3)
+```r
+df_total<-MSE_simulation(mu=t,tau_range =  c(-2,3),alp=1,plt3=T,ct=0.1,rank=3)
 ```
 
-![](new_g_model_simulation_sup_files/figure-markdown_github/unnamed-chunk-6-2.png)
+![](new_g_model_simulation_sup_files/figure-html/unnamed-chunk-6-2.png)<!-- -->![](new_g_model_simulation_sup_files/figure-html/unnamed-chunk-6-3.png)<!-- -->
 
-``` r
+```r
 MSE_df <- data.frame()
 findf <- data.frame()
 findf_sd <-data.frame()
 alp_range <-seq(0,3,1)
-for (j in alp_range) {
-  for (i in 1:1) {
-  dfs<-MSE_simulation(mu=t,tau_range = c(-2,3),alp=j,ct=0.1,rank=3)
-  MSE_s <-c(mean((dfs$E_theta_trunc-dfs$theta_selected)^2),mean((dfs$E_theta_selective[dfs$E_theta_selective>-2]-dfs$theta_selected[dfs$E_theta_selective>-2])^2),mean((dfs$E_theta_g-dfs$theta_selected)^2),mean((dfs$E_theta_trunc_F-dfs$theta_selected)^2),mean((dfs$E_theta_oracle-dfs$theta_selected)^2),mean((dfs$E_theta_F-dfs$theta_selected)^2),mean((dfs$selected_y-dfs$theta_selected)^2))
-  MSE_df<-rbind(MSE_df,MSE_s)
-  }
- findf<-rbind(findf,colMeans(MSE_df))
-  findf_sd <-rbind(findf_sd,apply(MSE_df,2,sd))
-  MSE_df <- data.frame()
-}
+#for (j in alp_range) {
+#  for (i in 1:2) {
+#  dfs<-MSE_simulation(mu=t,tau_range = c(-2,3),alp=j,ct=0.1,rank=3)
+#  MSE_s <-c(mean((dfs$E_theta_trunc-dfs$theta_selected)^2),mean((dfs$E_theta_selective[dfs$#E_theta_selective>-2]-dfs$theta_selected[dfs$E_theta_selective>-2])^2),mean((dfs$E_theta_g-#dfs$theta_selected)^2),mean((dfs$E_theta_trunc_F-dfs$theta_selected)^2),mean((dfs$E_theta_o#racle-dfs$theta_selected)^2),mean((dfs$E_theta_F-dfs$theta_selected)^2),mean((dfs$selected_#y-dfs$theta_selected)^2))
+#  MSE_df<-rbind(MSE_df,MSE_s)
+#  }
+# findf<-rbind(findf,colMeans(MSE_df))
+#  findf_sd <-rbind(findf_sd,apply(MSE_df,2,sd))
+#  MSE_df <- data.frame()
+#}
 
-colnames(findf)<-c("E_theta_trunc_G","E_theta-selective","E_theta_G","E_theta_trunc_F","E_theta_oracle","E_theta_F","Naive")
-rownames(findf)<-c("0","1","2","3")
-print(findf)
+#colnames(findf)<-c("E_theta_trunc_G","E_theta-selective","E_theta_G","E_theta_trunc_F","E_t#heta_oracle","E_theta_F","Naive")
+#rownames(findf)<-c("0","1","2","3")
+#print(findf)
+#colnames(findf_sd)<-c("E_theta_trunc_G","E_theta-selective","E_theta_G","E_theta_trunc_F","#E_theta_oracle","E_theta_F","Naive")
+#rownames(findf_sd)<-c("0","1","2","3")
+#print(findf_sd)
 ```
 
-    ##   E_theta_trunc_G E_theta-selective E_theta_G E_theta_trunc_F E_theta_oracle
-    ## 0       0.5905448          1.458860 0.6008775       0.6162354      0.5866387
-    ## 1       0.3665895          1.814759 0.3746594       0.3681194      0.3575685
-    ## 2       0.3241309          2.350874 0.2618516       0.2640296      0.2358635
-    ## 3       0.2857852          2.402939 0.2656583       0.7016156      0.2180702
-    ##   E_theta_F     Naive
-    ## 0 0.6330822 0.9922279
-    ## 1 0.4439667 0.8581252
-    ## 2 0.4528155 1.2216412
-    ## 3 0.3225595 2.4563073
 
-``` r
-colnames(findf_sd)<-c("E_theta_trunc_G","E_theta-selective","E_theta_G","E_theta_trunc_F","E_theta_oracle","E_theta_F","Naive")
-rownames(findf_sd)<-c("0","1","2","3")
-print(findf_sd)
-```
 
-    ##   E_theta_trunc_G E_theta-selective E_theta_G E_theta_trunc_F E_theta_oracle
-    ## 0              NA                NA        NA              NA             NA
-    ## 1              NA                NA        NA              NA             NA
-    ## 2              NA                NA        NA              NA             NA
-    ## 3              NA                NA        NA              NA             NA
-    ##   E_theta_F Naive
-    ## 0        NA    NA
-    ## 1        NA    NA
-    ## 2        NA    NA
-    ## 3        NA    NA
 
-``` r
+
+```r
 t <- c()
 for (i in 1:10000) {
   u <- runif(1)
@@ -314,67 +291,45 @@ for (i in 1:10000) {
 }
 
 
-ggplot(data =data.frame(t)) +geom_histogram(aes(t),bins = 30,col="black",fill="white") + ggtitle(TeX("Gaussion Mixture")) +theme_bw() +xlab(TeX("\\theta"))
+ggplot(data =data.frame(t)) +geom_histogram(aes(t),bins = 30,col="black",fill="white") + ggtitle(TeX("Gaussion Mixture")) +theme_bw() +xlab(TeX("\\Theta"))
 ```
 
-![](new_g_model_simulation_sup_files/figure-markdown_github/unnamed-chunk-7-1.png)
+![](new_g_model_simulation_sup_files/figure-html/unnamed-chunk-7-1.png)<!-- -->
 
-``` r
-df_total<-MSE_simulation(mu=t,tau_range =  c(-5,7),alp=1,plt2=T,ct=0.005,rank=5)
+```r
+df_total<-MSE_simulation(mu=t,tau_range =  c(-5,7),alp=1,plt3=T,ct=0.005,rank=5)
 ```
 
-![](new_g_model_simulation_sup_files/figure-markdown_github/unnamed-chunk-7-2.png)
+![](new_g_model_simulation_sup_files/figure-html/unnamed-chunk-7-2.png)<!-- -->![](new_g_model_simulation_sup_files/figure-html/unnamed-chunk-7-3.png)<!-- -->
 
-``` r
+```r
 MSE_df <- data.frame()
 findf <- data.frame()
 findf_sd <-data.frame()
 alp_range <-seq(0,3,1)
-for (j in alp_range) {
-  for (i in 1:1) {
-  dfs<-MSE_simulation(mu=t,tau_range = c(-5,7),alp=j,ct=0.005,rank=5)
-  MSE_s <-c(mean((dfs$E_theta_trunc-dfs$theta_selected)^2),mean((dfs$E_theta_selective[dfs$E_theta_selective>-1.5]-dfs$theta_selected[dfs$E_theta_selective>-1.5])^2),mean((dfs$E_theta_g-dfs$theta_selected)^2),mean((dfs$E_theta_trunc_F-dfs$theta_selected)^2),mean((dfs$E_theta_oracle-dfs$theta_selected)^2),mean((dfs$E_theta_F-dfs$theta_selected)^2),mean((dfs$selected_y-dfs$theta_selected)^2))
-  MSE_df<-rbind(MSE_df,MSE_s)
-  }
- findf<-rbind(findf,colMeans(MSE_df))
-  findf_sd <-rbind(findf_sd,apply(MSE_df,2,sd))
-  MSE_df <- data.frame()
-}
+#for (j in alp_range) {
+#  for (i in 1:2) {
+#  dfs<-MSE_simulation(mu=t,tau_range = c(-5,7),alp=j,ct=0.005,rank=5)
+#  MSE_s <-c(mean((dfs$E_theta_trunc-dfs$theta_selected)^2),mean((dfs$E_theta_selective[dfs$#E_theta_selective>-1.5]-dfs$theta_selected[dfs$E_theta_selective>-1.5])^2),mean((dfs$E_thet#a_g-dfs$theta_selected)^2),mean((dfs$E_theta_trunc_F-dfs$theta_selected)^2),mean((dfs$E_the#ta_oracle-dfs$theta_selected)^2),mean((dfs$E_theta_F-dfs$theta_selected)^2),mean((dfs$selec#ted_y-dfs$theta_selected)^2))
+#  MSE_df<-rbind(MSE_df,MSE_s)
+#  }
+# findf<-rbind(findf,colMeans(MSE_df))
+#  findf_sd <-rbind(findf_sd,apply(MSE_df,2,sd))
+#  MSE_df <- data.frame()
+#}
 
-colnames(findf)<-c("E_theta_trunc_G","E_theta-selective","E_theta_G","E_theta_trunc_F","E_theta_oracle","E_theta_F","Naive")
-rownames(findf)<-c("0","1","2","3")
-print(findf)
+#colnames(findf)<-c("E_theta_trunc_G","E_theta-selective","E_theta_G","E_theta_trunc_F","E_t#heta_oracle","E_theta_F","Naive")
+#rownames(findf)<-c("0","1","2","3")
+#print(findf)
+#colnames(findf_sd)<-c("E_theta_trunc_G","E_theta-selective","E_theta_G","E_theta_trunc_F","#E_theta_oracle","E_theta_F","Naive")
+#rownames(findf_sd)<-c("0","1","2","3")
+#print(findf_sd)
 ```
 
-    ##   E_theta_trunc_G E_theta-selective E_theta_G E_theta_trunc_F E_theta_oracle
-    ## 0       0.2714995          1.185697 0.2394174       0.2690057      0.2302358
-    ## 1       0.4323545          1.510105 0.4518068       0.4335915      0.4180130
-    ## 2       1.0056360          1.961897 0.9407176       0.9583075      0.8869789
-    ## 3       1.4543338          2.567098 1.3426534       1.2812342      1.2027942
-    ##   E_theta_F     Naive
-    ## 0 0.2313843 0.9493847
-    ## 1 0.4208551 2.0753223
-    ## 2 0.9004840 3.5573775
-    ## 3 1.2076576 3.1635908
 
-``` r
-colnames(findf_sd)<-c("E_theta_trunc_G","E_theta-selective","E_theta_G","E_theta_trunc_F","E_theta_oracle","E_theta_F","Naive")
-rownames(findf_sd)<-c("0","1","2","3")
-print(findf_sd)
-```
 
-    ##   E_theta_trunc_G E_theta-selective E_theta_G E_theta_trunc_F E_theta_oracle
-    ## 0              NA                NA        NA              NA             NA
-    ## 1              NA                NA        NA              NA             NA
-    ## 2              NA                NA        NA              NA             NA
-    ## 3              NA                NA        NA              NA             NA
-    ##   E_theta_F Naive
-    ## 0        NA    NA
-    ## 1        NA    NA
-    ## 2        NA    NA
-    ## 3        NA    NA
 
-``` r
+```r
 gdat_samp<- read.csv("GDR3_QUASARS_1.csv")
 
 
@@ -383,15 +338,19 @@ parallax <-gdat_samp$norm_parallax
 ggplot(data =data.frame(parallax),aes(x=parallax)) +geom_histogram(aes(y=..density..),bins = 100,col="black",fill="white") + ggtitle(TeX("Histogram of observed parallax values")) +theme_bw()+xlab(TeX("\\omega")) + geom_density(aes(color = "Parallax Density")) + scale_colour_manual("Legend title", values = c("red", "blue"))+ stat_function(aes(colour = " Standard Normal distribution"),fun=dnorm,args=list(mean=0,sd=1),size=1)+theme(legend.position = "bottom", legend.title = element_blank())
 ```
 
-    ## Warning: Using `size` aesthetic for lines was deprecated in ggplot2 3.4.0.
-    ## ℹ Please use `linewidth` instead.
+```
+## Warning: Using `size` aesthetic for lines was deprecated in ggplot2 3.4.0.
+## ℹ Please use `linewidth` instead.
+```
 
-    ## Warning: The dot-dot notation (`..density..`) was deprecated in ggplot2 3.4.0.
-    ## ℹ Please use `after_stat(density)` instead.
+```
+## Warning: The dot-dot notation (`..density..`) was deprecated in ggplot2 3.4.0.
+## ℹ Please use `after_stat(density)` instead.
+```
 
-![](new_g_model_simulation_sup_files/figure-markdown_github/unnamed-chunk-8-1.png)
+![](new_g_model_simulation_sup_files/figure-html/unnamed-chunk-8-1.png)<!-- -->
 
-``` r
+```r
 # calculate truncated G-modeling
 truncated_parallax <-parallax[(parallax>0)]
 sub_samp  <- gdat_samp[gdat_samp$parallax>0,]
@@ -406,28 +365,29 @@ ct=0.0005
 P_t <-deconvo_trunc_comp(a=alpa,b=Inf,tau=true_parallax,X=truncated_parallax,pDegree=4,n=100,c0=1)
 ```
 
-    ## Warning in stats::nlm(f = loglik, p = aStart, gradtol = 0.0000000001, ...):
-    ## NA/Inf replaced by maximum positive value
+```
+## Warning in stats::nlm(f = loglik, p = aStart, gradtol = 0.0000000001, ...):
+## NA/Inf replaced by maximum positive value
+```
 
-``` r
+```r
 result <- deconvo_trunc(a=alpa,b=Inf,tau=true_parallax,X=truncated_parallax,pDegree=4,n=100,c0=1)
 ```
 
-    ## Warning in stats::nlm(f = loglik, p = aStart, gradtol = 0.0000000001, ...):
-    ## NA/Inf replaced by maximum positive value
-
-    ## Warning in stats::nlm(f = loglik, p = aStart, gradtol = 0.0000000001, ...):
-    ## NA/Inf replaced by maximum positive value
-
-``` r
-tprobs.hat <- result$stats[,'g']
-ct1 <-colSums(P_t)>ct
-plot(result$stats[,'theta'],result$stats[,'g'])
+```
+## Warning in stats::nlm(f = loglik, p = aStart, gradtol = 0.0000000001, ...):
+## NA/Inf replaced by maximum positive value
 ```
 
-![](new_g_model_simulation_sup_files/figure-markdown_github/unnamed-chunk-8-2.png)
+```
+## Warning in stats::nlm(f = loglik, p = aStart, gradtol = 0.0000000001, ...):
+## NA/Inf replaced by maximum positive value
+```
 
-``` r
+```r
+tprobs.hat <- result$stats[,'g']
+ct1 <-colSums(P_t)>ct
+
 f <- function(tau,y,tprobs.hat,sd1=1,sd2=1,ct){sum(tau[ct]/sd1 * tprobs.hat[ct] * dnorm(x=y,mean=tau[ct],sd = sd2)/(1-pnorm(q=alpa,mean =tau[ct] ,sd = sd2)),na.rm = TRUE)/sum(tprobs.hat[ct] * dnorm(x=y,mean=tau[ct],sd = sd2)/(1-pnorm(q=alpa,mean =tau[ct],sd = sd2)),na.rm = TRUE)}
 
 
@@ -443,9 +403,9 @@ LZ_corr<-function(w_t,w,sd_w=1,sd_w2=1){
 h.f <- hist(truncated_parallax2,breaks=seq(range(truncated_parallax2)[1],range(truncated_parallax2)[2],length.out = 100))
 ```
 
-![](new_g_model_simulation_sup_files/figure-markdown_github/unnamed-chunk-8-3.png)
+![](new_g_model_simulation_sup_files/figure-html/unnamed-chunk-8-2.png)<!-- -->
 
-``` r
+```r
 sig_mids<-approx(truncated_parallax2,truncated_sig,xout=h.f$mids,rule=2,ties=mean)$y
 y <- h.f$counts
 
@@ -455,10 +415,12 @@ custom_P_mat <- t(t(custom_P_mat)/colSums(custom_P_mat))
 costom_results <- deconv(P=custom_P_mat,Q=result$Q,tau=true_parallax,y=y,pDegree=4,n=100,c0=1)
 ```
 
-    ## Warning in stats::nlm(f = loglik, p = aStart, gradtol = 0.0000000001, ...):
-    ## NA/Inf replaced by maximum positive value
+```
+## Warning in stats::nlm(f = loglik, p = aStart, gradtol = 0.0000000001, ...):
+## NA/Inf replaced by maximum positive value
+```
 
-``` r
+```r
 tprobs.hat_costum <- costom_results$stats[,'g']
 ct1_costum <-colSums(custom_P_mat)>ct
 
@@ -483,10 +445,12 @@ for (i in 1:length(truncated_parallax)) {
 res <- deconv(tau = true_parallax,X = parallax,family = "Normal",pDegree = 4,n=100,c0 =1)
 ```
 
-    ## Warning in stats::nlm(f = loglik, p = aStart, gradtol = 0.0000000001, ...):
-    ## NA/Inf replaced by maximum positive value
+```
+## Warning in stats::nlm(f = loglik, p = aStart, gradtol = 0.0000000001, ...):
+## NA/Inf replaced by maximum positive value
+```
 
-``` r
+```r
 g <- res$stats[,"g"]
 
 
@@ -500,4 +464,8 @@ scale_size_continuous(range = c(2, 2)) + theme_bw() +theme(legend.position = "bo
 Gs_plot
 ```
 
-![](new_g_model_simulation_sup_files/figure-markdown_github/unnamed-chunk-8-4.png)
+![](new_g_model_simulation_sup_files/figure-html/unnamed-chunk-8-3.png)<!-- -->
+
+
+
+
